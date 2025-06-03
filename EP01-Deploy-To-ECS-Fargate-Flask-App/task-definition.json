@@ -1,0 +1,43 @@
+{
+  "family": "flask-app-task-definition",
+  "networkMode": "awsvpc",
+  "containerDefinitions": [
+    {
+      "name": "flask-container",
+      "image": "654654632094.dkr.ecr.us-east-1.amazonaws.com/flask-app",
+      "cpu": 0,
+      "portMappings": [
+                    {
+                        "containerPort": 5000,
+                        "hostPort": 5000,
+                        "protocol": "tcp",
+                        "name": "flask-port",
+                        "appProtocol": "http"
+                    }
+                ],
+      "essential": true,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+                        "awslogs-group": "/ecs/flask-app-task-definition",
+                        "mode": "non-blocking",
+                        "awslogs-create-group": "true",
+                        "max-buffer-size": "25m",
+                        "awslogs-region": "us-east-1",
+                        "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ],
+  "executionRoleArn": "arn:aws:iam::654654632094:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::654654632094:role/ecsTaskExecutionRole",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "1024",
+  "memory": "3072",
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  }
+}
