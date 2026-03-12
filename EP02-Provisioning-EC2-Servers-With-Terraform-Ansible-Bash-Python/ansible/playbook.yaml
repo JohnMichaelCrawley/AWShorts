@@ -1,0 +1,77 @@
+- hosts: all
+  become: yes
+
+  vars:
+    ascii_text:
+      "Server1": |
+        _____                        ___
+        |   __|___ ___ _ _ ___ ___   |_  |
+        |__   | -_|  _| | | -_|  _|   _| |_
+        |_____|___|_|  \_/|___|_|    |_____|
+        Server1
+
+      "Server2": |
+        _____                        ___
+        |   __|___ ___ _ _ ___ ___   |_  |
+        |__   | -_|  _| | | -_|  _|  |  _|
+        |_____|___|_|  \_/|___|_|    |___|
+        Server2
+
+      "Server3": |
+        _____                        ___
+        |   __|___ ___ _ _ ___ ___   |_  |
+        |__   | -_|  _| | | -_|  _|  |_  |
+        |_____|___|_|  \_/|___|_|    |___|
+        Server3
+
+      "Server4": |
+        _____                        ___
+        |   __|___ ___ _ _ ___ ___   | | |
+        |__   | -_|  _| | | -_|  _|  |_  |
+        |_____|___|_|  \_/|___|_|      |_|
+        Server4
+
+  tasks:
+
+    - name: Update APT packages
+      apt:
+        update_cache: yes
+
+    - name: Install packages
+      apt:
+        name:
+          - htop
+          - python3-psutil
+        state: present
+
+    - name: Copy Python Server
+      copy:
+        src: ../app/server.py
+        dest: /home/ubuntu/server.py
+        owner: ubuntu
+        group: ubuntu
+        mode: '0755'
+
+    - name: Set server tag
+      copy:
+        content: "{{ hostvars[inventory_hostname].tags.Name }}"
+        dest: /etc/server_tag
+    - name: Set ASCII Banner 
+      copy:
+        content: "{{ ascii_text[hostvars[inventory_hostname].tags.Name] }}"
+        dest: /etc/server_ascii
+
+    - name: Create SystemD Service
+      template:
+        src: ../app/templates/server.service.j2
+        dest: /etc/systemd/system/python-server.service
+
+    - name: Reload SystemD daemon
+      command: systemctl daemon-reload
+
+    - name: Enable and Start Python Server
+      systemd:
+        name: python-server
+        enabled: yes
+        state: restarted
+    

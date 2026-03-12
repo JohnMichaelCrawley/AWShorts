@@ -1,0 +1,11 @@
+[Unit]
+Description=Simple Python HTTP Server
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/ubuntu/server.py
+Restart=always
+User=ubuntu
+
+[Install]
+WantedBy=multi-user.target
